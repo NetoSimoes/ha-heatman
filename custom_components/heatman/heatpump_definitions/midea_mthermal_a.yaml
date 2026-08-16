@@ -20,8 +20,8 @@ default:
   update_interval: 30
   digits: 1
   code: 0x03
-  min_span: 25
-  max_size: 125
+  min_span: 1
+  max_size: 20
 
 parameters:
   - group: Control

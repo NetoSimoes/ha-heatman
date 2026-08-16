@@ -76,6 +76,7 @@ class Solarman:
         self._data_queue: asyncio.Queue[bytes] = asyncio.Queue(maxsize = 1)
         self._data_event = Event()
         self._last_frame: bytes | None = None
+        self._rx_buf = bytearray()
 
     @staticmethod
     def _get_response_code(code: int):
@@ -109,6 +110,7 @@ class Solarman:
     @transport.setter
     def transport(self, value: str):
         self._transport = value
+        self._rx_buf.clear()
         if value == "tcp":
             self._get_response = self._parse_adu_from_sol_response
             self._handle_frame = self._handle_protocol_frame
@@ -187,6 +189,33 @@ class Solarman:
                 await self._write(response_frame)
         return do_continue
 
+    def _extract_frames(self, data: bytes) -> list[bytes]:
+        if self._handle_frame is not None or self.transport.endswith("rtu"):
+            return [data]
+        self._rx_buf.extend(data)
+        frames: list[bytes] = []
+        while len(self._rx_buf) >= 7:
+            length = int.from_bytes(self._rx_buf[4:6], "big")
+            if length < 1 or length > 260:
+                _LOGGER.debug(f"[{self.host}] Invalid MBAP length {length}, dropping {self._rx_buf.hex(' ')}")
+                self._rx_buf.clear()
+                break
+            total = 7 + length
+            if len(self._rx_buf) < total:
+                break
+            frames.append(bytes(self._rx_buf[:total]))
+            del self._rx_buf[:total]
+        return frames
+
+    def _enqueue_frame(self, frame: bytes) -> None:
+        if not self._data_event.is_set():
+            _LOGGER.debug(f"[{self.host}] Data received too late")
+            return
+        if not self._data_queue.empty():
+            _ = self._data_queue.get_nowait()
+        self._data_queue.put_nowait(frame)
+        self._data_event.clear()
+
     async def _keeper_loop(self):
         while True:
             try:
@@ -197,21 +226,17 @@ class Solarman:
             if data == b"":
                 _LOGGER.debug(f"[{self.host}] Connection closed. Will try to restart the connection")
                 break
-            if self._handle_frame is not None and not await self._handle_frame(data):
-                # Skip...
-                continue
-            if not self._data_event.is_set():
-                _LOGGER.debug(f"[{self.host}] Data received too late")
-                continue
-            if not self._data_queue.empty():
-                _ = self._data_queue.get_nowait()
-            self._data_queue.put_nowait(data)
-            self._data_event.clear()
+            for frame in self._extract_frames(data):
+                if self._handle_frame is not None and not await self._handle_frame(frame):
+                    continue
+                self._enqueue_frame(frame)
+        self._rx_buf.clear()
         self._keeper = create_task(self._open_connection())
 
     @throttle(0.2)
     async def _open_connection(self) -> None:
         try:
+            self._rx_buf.clear()
             self._reader, self._writer = await asyncio.wait_for(asyncio.open_connection(self.host, self.port), self.timeout)
             self._keeper = create_task(self._keeper_loop())
             if self._data_event.is_set():
@@ -240,6 +265,7 @@ class Solarman:
             self._writer = None
 
         self._reader = None
+        self._rx_buf.clear()
 
     @throttle(0.1)
     @log_call("SENT")
@@ -306,9 +332,19 @@ class Solarman:
     async def _parse_adu_from_tcp_response(self, code: int, address: int, **kwargs) -> list[int]:
         req = tcp.function_code_to_function_map[code](self.slave, address, **kwargs)
         res = await self._send_receive_frame(req)
-        if 8 <= len(res) <= 10: # Incomplete response correction
+        if len(res) < 8:
+            raise FrameError(f"Short Modbus TCP frame ({len(res)} bytes)")
+        if res[7] & 0x80:
+            return tcp.parse_response_adu(res, req)
+        expected = 7 + int.from_bytes(res[4:6], "big")
+        if len(res) < expected:
+            raise FrameError(f"Incomplete Modbus TCP frame ({len(res)}/{expected} bytes)")
+        if 8 <= len(res) <= 10:
             res = res[:5] + b'\x06' + res[6:] + (req[len(res):10] if len(req) > 12 else (b'\x00' * (10 - len(res)))) + b'\x00\x01'
-        return tcp.parse_response_adu(res, req)
+        try:
+            return tcp.parse_response_adu(res, req)
+        except struct.error as e:
+            raise FrameError(f"Invalid Modbus TCP payload ({len(res)} bytes): {e}") from e
 
     @retry()
     async def get_response(self, code: int, address: int, **kwargs):

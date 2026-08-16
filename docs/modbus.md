@@ -23,11 +23,11 @@ See [Services](services.md).
 
 ## Batching
 
-| Setting | Default |
-|---------|---------|
-| `min_span` | 25 |
-| `max_size` | 125 |
-| `code` | 0x03 |
+| Setting | Default | M-Thermal profile |
+|---------|---------|-------------------|
+| `min_span` | 25 | **1** (do not fill unmapped holes) |
+| `max_size` | 125 | **20** |
+| `code` | 0x03 | 0x03 |
 
 ## Slave ID
 

@@ -37,6 +37,7 @@ In Heatman: transport `modbus_tcp`, port `502`, slave ID matching S3, profile `m
 | Symptom | Check |
 |---------|-------|
 | No Modbus data | Wired controller connected? H1/H2 polarity? S3 address? |
+| `unpack requires a buffer of 24 bytes` | Partial Modbus TCP frame or a 0–11 register batch that includes unmapped register 2. Use Heatman 0.2.1+ (`min_span: 1`). Confirm transport `modbus_tcp` and port 502. |
 | H0 error | Outdoor ↔ hydronic communication (P/Q/E), power supply |
 | E3–E9 / HA / Ed | Temperature sensor wiring on PCB |
 | P0 / P1 | Low / high refrigerant pressure protections |
