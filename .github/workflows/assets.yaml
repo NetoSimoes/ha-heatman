@@ -2,7 +2,13 @@ name: Attach Assets
 on:
   release:
     types:
-      - created
+      - published
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to attach heatman.zip to
+        required: true
+        default: v0.1.0
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -13,11 +19,15 @@ jobs:
       uses: actions/checkout@v4
       with:
         submodules: true
+        ref: ${{ github.event.release.tag_name || inputs.tag }}
     - name: Set
       run: |
           echo "workspace=${{ github.workspace }}" >> $GITHUB_ENV
-          echo "name=$(echo ${{ github.event.repository.name }} | sed 's/^[^-]*-//')" >> $GITHUB_ENV
-          echo "version=$(echo '${{ github.event.release.name }}' | cut -c 2-)" >> $GITHUB_ENV
+          echo "name=heatman" >> $GITHUB_ENV
+          TAG="${{ github.event.release.tag_name || inputs.tag }}"
+          NAME="${{ github.event.release.name || inputs.tag }}"
+          echo "tag=$TAG" >> $GITHUB_ENV
+          echo "version=${NAME#v}" >> $GITHUB_ENV
     - name: Prepare
       run: |
           cp $workspace/license $workspace/custom_components/$name/
@@ -27,7 +37,7 @@ jobs:
           cd $workspace/custom_components/$name
           zip -r ../$name.zip . -x "*.git*" "*.git/*" "*.github/*"
     - name: Release
-      uses: softprops/action-gh-release@v1
-      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v2
       with:
+        tag_name: ${{ env.tag }}
         files: ${{ env.workspace }}/custom_components/${{ env.name }}.zip

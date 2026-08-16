@@ -5,3 +5,4 @@ __pycache__/
 
 # HACS
 custom_components/heatman/heatpump_definitions/custom/
+heatman.zip
