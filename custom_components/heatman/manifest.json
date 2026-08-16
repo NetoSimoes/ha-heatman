@@ -1,0 +1,14 @@
+{
+  "domain": "heatman",
+  "name": "Heatman",
+  "codeowners": ["@rodrigo.f.simoes"],
+  "config_flow": true,
+  "dependencies": ["network"],
+  "documentation": "https://gitlab.com/rodrigo.f.simoes/ha-heatman",
+  "integration_type": "device",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://gitlab.com/rodrigo.f.simoes/ha-heatman/-/issues",
+  "quality_scale": "custom",
+  "requirements": ["aiofiles"],
+  "version": "0.0.0"
+}

@@ -1,0 +1,462 @@
+#
+# Midea M-Thermal A Series (and OEM clones: Solius, Hyundai, Concept, Hajdu, Immergas, Clivet Swan)
+#
+# Verified against a live Solius Home Assistant Modbus configuration.
+# Community-sourced holding registers — not an official Midea public Modbus manual.
+#
+# Connection: Modbus RTU 9600 8N1 on wired-controller H1/H2, or Modbus TCP gateway (port 502).
+# Transport in Heatman: prefer modbus_tcp. Slave ID from hydronic PCB rotary S3 (0 => 1).
+#
+# Bit masks (register 0 / 5) match Solius template switches.
+# Energy uint32: this engine packs the first listed register as the low word.
+# If cumulative kWh looks wrong vs your old HA modbus sensors, swap the register pair order.
+#
+
+info:
+  manufacturer: Midea
+  model: M-Thermal A Series
+
+default:
+  update_interval: 30
+  digits: 1
+  code: 0x03
+  min_span: 25
+  max_size: 125
+
+parameters:
+  - group: Control
+    update_interval: 15
+    items:
+      - name: "Heating"
+        platform: switch
+        rule: 1
+        registers: [0]
+        icon: "mdi:radiator"
+        value:
+          bit: 1
+
+      - name: "DHW"
+        platform: switch
+        rule: 1
+        registers: [0]
+        icon: "mdi:water-boiler"
+        value:
+          bit: 2
+
+      - name: "Disinfection"
+        platform: switch
+        rule: 1
+        registers: [5]
+        icon: "mdi:virus-off"
+        value:
+          bit: 4
+
+      - name: "Silent Mode"
+        platform: switch
+        rule: 1
+        registers: [5]
+        icon: "mdi:volume-off"
+        value:
+          bit: 6
+
+      - name: "Eco Mode"
+        platform: switch
+        rule: 1
+        registers: [5]
+        icon: "mdi:leaf"
+        value:
+          bit: 10
+
+      - name: "Forced Water Heating"
+        platform: switch
+        rule: 1
+        registers: [7]
+        icon: "mdi:water-boiler"
+        value:
+          on: 1
+          off: 0
+
+      - name: "Forced TBH"
+        platform: switch
+        rule: 1
+        registers: [8]
+        icon: "mdi:heating-coil"
+        value:
+          on: 1
+          off: 0
+
+      - name: "Forced IBH1"
+        platform: switch
+        rule: 1
+        registers: [9]
+        icon: "mdi:heating-coil"
+        value:
+          on: 1
+          off: 0
+
+      - name: "Mode"
+        platform: select
+        class: "enum"
+        rule: 1
+        registers: [1]
+        icon: "mdi:thermostat"
+        lookup:
+          - key: 1
+            value: "auto"
+          - key: 2
+            value: "cool"
+          - key: 3
+            value: "heat"
+
+      - name: "Room Setpoint"
+        platform: number
+        class: "temperature"
+        rule: 2
+        registers: [3]
+        uom: "°C"
+        icon: "mdi:thermostat-box"
+        configurable:
+          min: 16
+          max: 30
+          step: 1
+          mode: box
+
+      - name: "DHW Setpoint"
+        platform: number
+        class: "temperature"
+        rule: 2
+        registers: [4]
+        uom: "°C"
+        icon: "mdi:water-boiler"
+        configurable:
+          min: 40
+          max: 60
+          step: 1
+          mode: box
+
+      - name: "Heating Setpoint"
+        platform: number
+        class: "temperature"
+        rule: 2
+        registers: [11]
+        uom: "°C"
+        icon: "mdi:radiator"
+        configurable:
+          min: 17
+          max: 65
+          step: 1
+          mode: box
+
+      - name: "Curve Selection"
+        rule: 1
+        registers: [6]
+        icon: "mdi:chart-bell-curve"
+
+      - name: "Smart Grid Max Setpoint"
+        class: "temperature"
+        state_class: "measurement"
+        rule: 2
+        registers: [10]
+        uom: "°C"
+        update_interval: 60
+
+  - group: Temperatures
+    update_interval: 15
+    items:
+      - name: "Inlet Water Temperature"
+        class: "temperature"
+        state_class: "measurement"
+        rule: 2
+        registers: [104]
+        uom: "°C"
+        icon: "mdi:thermometer-chevron-down"
+
+      - name: "Outlet Water Temperature"
+        class: "temperature"
+        state_class: "measurement"
+        rule: 2
+        registers: [105]
+        uom: "°C"
+        icon: "mdi:thermometer-chevron-up"
+
+      - name: "Calculated Water Temperature"
+        class: "temperature"
+        state_class: "measurement"
+        rule: 2
+        registers: [110]
+        uom: "°C"
+        icon: "mdi:thermometer-water"
+
+      - name: "Outdoor Temperature"
+        class: "temperature"
+        state_class: "measurement"
+        rule: 2
+        registers: [107]
+        uom: "°C"
+        update_interval: 30
+        icon: "mdi:sun-thermometer"
+
+      - name: "DHW Temperature"
+        class: "temperature"
+        state_class: "measurement"
+        rule: 2
+        registers: [115]
+        uom: "°C"
+        update_interval: 30
+        icon: "mdi:water-thermometer"
+
+      - name: "T3 Condenser Temperature"
+        class: "temperature"
+        state_class: "measurement"
+        rule: 2
+        registers: [106]
+        uom: "°C"
+        update_interval: 60
+
+      - name: "Discharge Temperature"
+        class: "temperature"
+        state_class: "measurement"
+        rule: 2
+        registers: [108]
+        uom: "°C"
+        update_interval: 60
+
+      - name: "Suction Temperature"
+        class: "temperature"
+        state_class: "measurement"
+        rule: 2
+        registers: [109]
+        uom: "°C"
+        update_interval: 60
+
+      - name: "T2 Liquid Pipe Temperature"
+        class: "temperature"
+        state_class: "measurement"
+        rule: 2
+        registers: [112]
+        uom: "°C"
+        update_interval: 60
+
+      - name: "T2B Gas Pipe Temperature"
+        class: "temperature"
+        state_class: "measurement"
+        rule: 2
+        registers: [113]
+        uom: "°C"
+        update_interval: 60
+
+      - name: "Weather Compensated Target"
+        class: "temperature"
+        state_class: "measurement"
+        rule: 2
+        registers: [136]
+        uom: "°C"
+        update_interval: 60
+
+  - group: Compressor
+    update_interval: 15
+    items:
+      - name: "Compressor Frequency"
+        class: "frequency"
+        state_class: "measurement"
+        rule: 2
+        registers: [100]
+        uom: "Hz"
+        icon: "mdi:sine-wave"
+
+      - name: "Fan Speed"
+        state_class: "measurement"
+        rule: 2
+        registers: [102]
+        uom: "rpm"
+        update_interval: 30
+        icon: "mdi:fan"
+
+      - name: "Target Frequency"
+        class: "frequency"
+        state_class: "measurement"
+        rule: 2
+        registers: [132]
+        uom: "Hz"
+        update_interval: 30
+
+      - name: "Compressor Operating Time"
+        state_class: "total_increasing"
+        rule: 1
+        registers: [122]
+        uom: "h"
+        update_interval: 300
+        icon: "mdi:timer-outline"
+
+      - name: "Water Flow"
+        state_class: "measurement"
+        rule: 2
+        registers: [138]
+        scale: 0.01
+        digits: 2
+        uom: "m³/h"
+        update_interval: 30
+        icon: "mdi:pipe"
+
+      - name: "Capacity"
+        class: "power"
+        state_class: "measurement"
+        rule: 2
+        registers: [140]
+        scale: 0.01
+        digits: 2
+        uom: "kW"
+        update_interval: 30
+        icon: "mdi:lightning-bolt"
+
+  - group: Electrical
+    update_interval: 30
+    items:
+      - name: "Outdoor Unit Current"
+        class: "current"
+        state_class: "measurement"
+        rule: 2
+        registers: [118]
+        uom: "A"
+
+      - name: "Outdoor Unit Voltage"
+        class: "voltage"
+        state_class: "measurement"
+        rule: 2
+        registers: [119]
+        uom: "V"
+        update_interval: 60
+
+      - name: "DC Bus Current"
+        class: "current"
+        state_class: "measurement"
+        rule: 2
+        registers: [133]
+        scale: 0.1
+        digits: 1
+        uom: "A"
+
+      - name: "DC Bus Voltage"
+        class: "voltage"
+        state_class: "measurement"
+        rule: 2
+        registers: [134]
+        scale: 10
+        digits: 0
+        uom: "V"
+
+      - name: "IBH1 Power"
+        class: "power"
+        state_class: "measurement"
+        rule: 1
+        registers: [250]
+        uom: "kW"
+        update_interval: 300
+
+      - name: "IBH2 Power"
+        class: "power"
+        state_class: "measurement"
+        rule: 1
+        registers: [251]
+        uom: "kW"
+        update_interval: 300
+
+      - name: "TBH Power"
+        class: "power"
+        state_class: "measurement"
+        rule: 1
+        registers: [252]
+        uom: "kW"
+        update_interval: 300
+
+  - group: Pressure
+    update_interval: 30
+    items:
+      - name: "High Pressure"
+        class: "pressure"
+        state_class: "measurement"
+        rule: 2
+        registers: [116]
+        uom: "kPa"
+
+      - name: "Low Pressure"
+        class: "pressure"
+        state_class: "measurement"
+        rule: 2
+        registers: [117]
+        uom: "kPa"
+
+  - group: Status
+    update_interval: 30
+    items:
+      - name: "Operating Mode"
+        class: "enum"
+        rule: 1
+        registers: [101]
+        icon: "mdi:heat-pump"
+        lookup:
+          - key: 0
+            value: "Off"
+          - key: 2
+            value: "Cooling"
+          - key: 3
+            value: "Heating"
+          - key: 5
+            value: "DHW"
+
+      - name: "Fault Code"
+        rule: 1
+        registers: [124]
+        icon: "mdi:alert"
+
+      - name: "Bit Status 1"
+        rule: 1
+        registers: [128]
+
+      - name: "Load Output"
+        state_class: "measurement"
+        rule: 1
+        registers: [129]
+        uom: "%"
+
+      - name: "Firmware IDU"
+        rule: 1
+        registers: [130]
+        update_interval: 3600
+        icon: "mdi:chip"
+
+      - name: "Sub Model"
+        class: "enum"
+        rule: 1
+        registers: [190]
+        update_interval: 3600
+        icon: "mdi:information-outline"
+        lookup:
+          - key: 3
+            value: "R290-A"
+          - key: 4
+            value: "R290-N"
+          - key: 9
+            value: "R290-M"
+
+  - group: Energy
+    update_interval: 300
+    items:
+      - name: "Electricity Consumption"
+        class: "energy"
+        state_class: "total_increasing"
+        rule: 1
+        registers: [143, 144]
+        scale: 0.01
+        digits: 2
+        uom: "kWh"
+        icon: "mdi:flash"
+
+      - name: "Heat Energy Output"
+        class: "energy"
+        state_class: "total_increasing"
+        rule: 1
+        registers: [145, 146]
+        digits: 2
+        uom: "kWh"
+        icon: "mdi:fire"

@@ -1,53 +1,52 @@
-# ⚡ Solarman Stick Logger
+# Heatman
 
-[![License](https://img.shields.io/github/license/davidrapan/ha-solarman)](https://github.com/davidrapan/ha-solarman/blob/main/license)
-[![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/davidrapan/ha-solarman/total)](https://github.com/davidrapan/ha-solarman/releases)
-[![GitHub Activity](https://img.shields.io/github/commit-activity/y/davidrapan/ha-solarman?label=commits)](https://github.com/davidrapan/ha-solarman/commits/main)
-[![HACS Supported](https://img.shields.io/badge/HACS-Supported-03a9f4)](https://github.com/custom-components/hacs)
-[![Community Forum](https://img.shields.io/badge/community-forum-03a9f4)](https://community.home-assistant.io/t/solarman-stick-logger-by-david-rapan)
-[![Discussions](https://img.shields.io/badge/discussions-orange)](https://github.com/davidrapan/ha-solarman/discussions)
-[![Wiki](https://img.shields.io/badge/wiki-8A2BE2)](https://github.com/davidrapan/ha-solarman/wiki)
+Home Assistant custom integration for **heat pumps over Modbus**.
 
-#### 🠶 Signpost
-- [Automations](https://github.com/davidrapan/ha-solarman/wiki/Automations)
-- [Custom Sensors](https://github.com/davidrapan/ha-solarman/wiki/Custom-Sensors)
-- [Dashboards](https://github.com/davidrapan/ha-solarman/wiki/Dashboards)
-- [Documentation](https://github.com/davidrapan/ha-solarman/wiki/Documentation)
-- [Naming Scheme](https://github.com/davidrapan/ha-solarman/wiki/Naming-Scheme)
-- [Supported Devices](https://github.com/davidrapan/ha-solarman/wiki/Supported-Devices)
+Domain: `heatman`. First supported map: **Midea M-Thermal A Series** (and OEM clones such as Solius), verified against a live Modbus TCP setup.
 
-> [!IMPORTANT]  
-> - Made for [🏡 Home Assistant](https://www.home-assistant.io/)  
-> - Read about [✍ crucial changes & new features](https://github.com/davidrapan/ha-solarman/wiki#-changes)  
-> - Built on asynchronous [pysolarmanv5](https://github.com/jmccrohan/pysolarmanv5) and supports Modbus TCP ([ESP](https://github.com/davidrapan/esphome-modbus_bridge), [Waveshare](https://www.waveshare.com/wiki/RS485_TO_ETH_(B)), [Ethernet logger](https://www.solarmanpv.com/download/lse-3/), etc.)
+Built on the YAML-driven Modbus engine from [ha-solarman](https://github.com/davidrapan/ha-solarman) (MIT), rebranded and retargeted for heat pumps.
 
-> [!NOTE]  
-> - If you are curious about what's planned next look into [🪧 Milestones](https://github.com/davidrapan/ha-solarman/milestones)  
-> - Use [💬 Discussions](https://github.com/davidrapan/ha-solarman/discussions) for 🙏 Q&A, 💡 Development Planning and 🎁 feature requests, etc. and [🚩 Issues](https://github.com/davidrapan/ha-solarman/issues) for 🐞 bug reporting and such...
+## Features
 
-## 🔌 Installation
+- Local Modbus TCP / RTU polling (default port **502**, transport **modbus_tcp**)
+- Declarative register profiles under `heatpump_definitions/`
+- Native switches (including bitfield RMW), selects, numbers, and sensors
+- Raw Modbus read/write services for debugging
 
-[![🔌 Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=davidrapan&repository=ha-solarman&category=integration)
+## Documentation
 
-- Go to Home Assistant Community Store
-- Search for and open **Solarman** repository
-- Make sure it's the right one (using displayed frontpage) and click DOWNLOAD
+- [Documentation index](docs/README.md)
+- [M-Thermal / Solius register map](docs/target/midea-mthermal.md)
+- [Hardware (H1/H2, S3, gateway)](docs/target/hardware-mthermal.md)
+- [Migrate from core `modbus:` + templates](docs/target/migration-solius.md)
 
-### 🛠 Manually
-- Copy the contents of `custom_components/` to `/homeassistant/custom_components/`
+## Installation
 
-## ⚙️ Configuration
+### Manual
 
-[![⚙️ Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=solarman)
+1. Copy `custom_components/heatman/` into your Home Assistant `custom_components/` directory.
+2. Restart Home Assistant.
+3. Settings → Devices & services → Add integration → **Heatman**.
 
-- Go to Settings > Devices & services > Integrations
-- Click ADD INTEGRATION, search for and select **Solarman**
-- Enter the appropriate details (should be autodiscovered under most circumstances) and click SUBMIT
+### HACS
 
-## 👤 Contributors
-<a href="https://github.com/davidrapan/ha-solarman/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=davidrapan/ha-solarman" />
-</a>
-<br>
-<br>
-<div align="right">Inspired by <a href="https://github.com/StephanJoubert/home_assistant_solarman">Stephan Joubert's Solarman</div>
+Add this repository as a custom integration repository when published; package name is **Heatman** (`heatman.zip`).
+
+## Configuration
+
+UI config flow only.
+
+| Field | Default | Notes |
+|-------|---------|-------|
+| Name | `Heat Pump` | Entity prefix |
+| Host | — | Gateway or device IP |
+| Port | `502` | Modbus TCP |
+| Transport | `modbus_tcp` | Or `modbus_rtu` / legacy `tcp` |
+| Profile | `midea_mthermal_a.yaml` | From `heatpump_definitions/` |
+| Modbus slave ID | `1` | Hydronic PCB S3 position 0 → 1 |
+
+## Attribution
+
+- Modbus engine based on [ha-solarman](https://github.com/davidrapan/ha-solarman) by David Rapan and contributors
+- M-Thermal register map verified on Solius OEM hardware; community / TapHome lineage
+- License: [MIT](license)

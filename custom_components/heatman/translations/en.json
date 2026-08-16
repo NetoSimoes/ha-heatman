@@ -1,0 +1,87 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "Device is already configured",
+      "already_configured_device": "Device is already configured",
+      "already_in_progress": "Configuration flow is already in progress"
+    },
+    "error": {
+      "cannot_connect": "Failed to connect",
+      "invalid_host": "Invalid hostname or IP address",
+      "timeout_connect": "Timeout establishing connection",
+      "unknown": "Unexpected error"
+    },
+    "step": {
+      "user": {
+        "title": "Heat pump configuration",
+        "data": {
+          "name": "Device name",
+          "host": "Hostname or IP address",
+          "port": "Port",
+          "transport": "Transport protocol",
+          "lookup_file": "Profile"
+        },
+        "data_description": {
+          "name": "This name will be prefixed to all entities",
+          "host": "Hostname or IP address of the Modbus gateway or heat pump",
+          "port": "Port (502 for Modbus TCP gateways)",
+          "transport": "Prefer Modbus TCP for RS485 Ethernet gateways",
+          "lookup_file": "YAML profile with heat-pump register definitions"
+        },
+        "sections": {
+          "additional_options": {
+            "name": "Additional options",
+            "data": {
+              "mod": "Profile modifier",
+              "mb_slave_id": "Modbus Slave ID (usually 1)"
+            }
+          }
+        }
+      }
+    }
+  },
+  "options": {
+    "error": {
+      "cannot_connect": "Failed to connect",
+      "invalid_host": "Invalid hostname or IP address",
+      "timeout_connect": "Timeout establishing connection",
+      "unknown": "Unexpected error"
+    },
+    "step": {
+      "init": {
+        "title": "Heat pump configuration",
+        "data": {
+          "host": "Hostname or IP address",
+          "port": "Port",
+          "transport": "Transport protocol",
+          "lookup_file": "Profile"
+        },
+        "data_description": {
+          "host": "Hostname or IP address of the Modbus gateway or heat pump",
+          "port": "Port (502 for Modbus TCP gateways)",
+          "transport": "Prefer Modbus TCP for RS485 Ethernet gateways",
+          "lookup_file": "YAML profile with heat-pump register definitions"
+        },
+        "sections": {
+          "additional_options": {
+            "name": "Additional options",
+            "data": {
+              "mod": "Profile modifier",
+              "mb_slave_id": "Modbus Slave ID (usually 1)"
+            }
+          }
+        }
+      }
+    }
+  },
+  "selector": {
+    "transport": {
+      "options": {
+        "tcp": "Solarman TCP (legacy)",
+        "udp": "UDP",
+        "modbus_tcp": "Modbus TCP",
+        "modbus_rtu": "Modbus RTU"
+      }
+    }
+  }
+}
