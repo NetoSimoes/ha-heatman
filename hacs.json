@@ -2,6 +2,7 @@
     "name": "Heatman",
     "zip_release": true,
     "filename": "heatman.zip",
+    "hide_default_branch": true,
     "homeassistant": "2025.2.0",
     "persistent_directory": "heatpump_definitions/custom"
 }

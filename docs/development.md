@@ -3,6 +3,7 @@
 ```
 ha-heatman/
 ├── custom_components/heatman/
+│   ├── brand/                  # HACS / HA icon.png
 │   ├── heatpump_definitions/   # Device YAML profiles
 │   ├── pysolarman/             # Vendored Modbus client
 │   ├── translations/

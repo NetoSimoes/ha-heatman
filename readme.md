@@ -30,7 +30,12 @@ Built on the YAML-driven Modbus engine from [ha-solarman](https://github.com/dav
 
 ### HACS
 
-Add this repository as a custom integration repository when published; package name is **Heatman** (`heatman.zip`).
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=NetoSimoes&repository=ha-heatman&category=integration)
+
+1. Use the badge above, or in HACS go to **Integrations** → **Custom repositories** and add `https://github.com/NetoSimoes/ha-heatman` as category **Integration**.
+2. Download **Heatman**.
+3. Restart Home Assistant.
+4. Settings → Devices & services → Add integration → **Heatman**.
 
 ## Configuration
 

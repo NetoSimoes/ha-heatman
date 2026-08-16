@@ -33,7 +33,7 @@
 
 ## Install
 
-- Copy `custom_components/heatman/` into HA config, or install via HACS when available (`heatman.zip`).
+- [HACS my-link](https://my.home-assistant.io/redirect/hacs_repository/?owner=NetoSimoes&repository=ha-heatman&category=integration), or copy `custom_components/heatman/` into HA config.
 - Add integration **Heatman** from the UI.
 
 ## Heritage
