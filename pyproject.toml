@@ -1,7 +1,23 @@
 [project]
 name = "ha-heatman"
 version = "0.1.0"
-description = "Add your description here"
+description = "Home Assistant custom integration for heat pumps over Modbus"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = []
+
+[project.optional-dependencies]
+test = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.24",
+    "voluptuous",
+    "aiofiles",
+    "pyyaml",
+    "aiohttp",
+    "propcache",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+pythonpath = ["custom_components"]
+testpaths = ["tests"]

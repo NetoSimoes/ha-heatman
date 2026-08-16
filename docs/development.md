@@ -15,9 +15,11 @@ ha-heatman/
 └── readme.md
 ```
 
-## CI
+## Tests
 
-[`.github/workflows/ha.yaml`](../.github/workflows/ha.yaml) — hassfest + HACS validation.
+`pytest` from the repo root. Optional extras: `pip install -e ".[test]"`.
+
+CI runs hassfest, HACS validation, and pytest.
 
 Release zip name is derived from the repo name suffix (`heatman` from `ha-heatman`) in [`assets.yaml`](../.github/workflows/assets.yaml).
 

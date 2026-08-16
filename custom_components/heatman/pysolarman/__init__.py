@@ -200,7 +200,7 @@ class Solarman:
                 _LOGGER.debug(f"[{self.host}] Invalid MBAP length {length}, dropping {self._rx_buf.hex(' ')}")
                 self._rx_buf.clear()
                 break
-            total = 7 + length
+            total = 6 + length
             if len(self._rx_buf) < total:
                 break
             frames.append(bytes(self._rx_buf[:total]))
@@ -336,7 +336,7 @@ class Solarman:
             raise FrameError(f"Short Modbus TCP frame ({len(res)} bytes)")
         if res[7] & 0x80:
             return tcp.parse_response_adu(res, req)
-        expected = 7 + int.from_bytes(res[4:6], "big")
+        expected = 6 + int.from_bytes(res[4:6], "big")
         if len(res) < expected:
             raise FrameError(f"Incomplete Modbus TCP frame ({len(res)}/{expected} bytes)")
         if 8 <= len(res) <= 10:
