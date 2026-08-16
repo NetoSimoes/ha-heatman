@@ -64,6 +64,7 @@ class Solarman:
     def __init__(self, host: str, port: int | str, transport: str, serial: int, slave: int, timeout: int):
         self.host = host
         self.port = port
+        self._rx_buf = bytearray()
         self.transport = transport
         self.serial = serial
         self.slave = slave
@@ -76,7 +77,6 @@ class Solarman:
         self._data_queue: asyncio.Queue[bytes] = asyncio.Queue(maxsize = 1)
         self._data_event = Event()
         self._last_frame: bytes | None = None
-        self._rx_buf = bytearray()
 
     @staticmethod
     def _get_response_code(code: int):
@@ -110,7 +110,7 @@ class Solarman:
     @transport.setter
     def transport(self, value: str):
         self._transport = value
-        self._rx_buf.clear()
+        self._rx_buf = bytearray()
         if value == "tcp":
             self._get_response = self._parse_adu_from_sol_response
             self._handle_frame = self._handle_protocol_frame
